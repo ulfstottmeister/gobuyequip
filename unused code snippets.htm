@@ -1,0 +1,186 @@
+<script>
+var currentmenu = ""; //fading out this feature..
+var keydebug = false;
+var menudebug = false;
+
+
+function menuhandler() {
+	if(currentmenu.length == 3) { 
+		console.log("Menu: " + currentmenu + " - Launching Buyhandler");
+
+		if(buyhandler(currentmenu) == true) { 
+			currentmenu = "";
+		} else {
+			//if the buyhandler returned false, no item was found
+			console.log("Error: Buyhandler returned false: No unique result. Menu up.");
+			currentmenu = currentmenu.substring(0, currentmenu.length - 1); //remove last char
+		}
+	} else if(currentmenu[0] == 'm') {
+		if(currentmenu.length == 1) {
+			//display team select picture
+		} else if(currentmenu.length > 1) {
+			if(currentmenu == "m1") {
+				//picked Terr
+				team = "t";
+				currentmenu = "";
+				console.log("Team: Terrorists");
+				//document.getElementById("team").innerHTML = "Terrorists";
+				document.getElementById("thebody").style.background	= 'radial-gradient(#6d6242 30%, #20180d 70%, black)'; //T background
+
+				//TODO: remove all equip and give stock items
+			} else if(currentmenu == "m2") {
+				team = "ct";
+				currentmenu = "";
+				console.log("Team: Counter-Terrorists");
+				//document.getElementById("team").innerHTML = "Counter-Terrorists";
+				document.getElementById("thebody").style.background	= 'radial-gradient(#32404b 30%, #0c1417 70%, black)'; //CT background
+
+				//TODO: remove all equip and give stock items
+			} else {
+				//selection does not exist.
+				currentmenu = currentmenu.substring(0, currentmenu.length - 1); //remove last char
+			}
+		}
+	}
+	if(menudebug == true) { 
+		console.log("Menu: " + currentmenu);
+	}
+	//var menupic = new File("menupix/ct" + currentmenu + ".jpg");
+	
+	document.getElementById("circledivcontainer").innerHTML = '<div class="circlepicdivclass" id="circlepicdiv"><img src="menupix/tb.jpg" id="circlepic" class="circlepicclass"></div>';
+	document.getElementById("teamselectpicdiv").innerHTML = '';
+
+	var menupic = new Image();
+	if(currentmenu[0] == 'b') {
+		menupic.src = "menupix/" + team + currentmenu + ".jpg";
+		document.getElementById("circlepic").src = menupic.src;
+		//console.log("Pic: " + menupic.src);
+	} else if(currentmenu[0] == 'm') {
+		//menupic.src = "menupix/teamselect.jpg";
+		document.getElementById("circledivcontainer").innerHTML = '';
+		document.getElementById("teamselectpicdiv").innerHTML = '<img src="menupix/teamselect.jpg" id="teamselectpic" class="teamselectclass">';
+		//console.log("Showing teamselect pic");
+	} else {
+		//currentmenu neither starts with m nor with b.
+		menupic.src = "menupix/buyzone" + team + ".jpg";
+		document.getElementById("circlepic").src = menupic.src;
+	}
+	
+}
+
+function buyhandler(menuselection) {
+	//converts menuselection to an array of items in question
+	//items of the opposite team are filtered out, but some menuselection will yield two weapons.
+	//The user need to give input about their loadout preferences to reduce it to one weapon per menuselection per team.
+	var foundweapons = new Array();
+	
+	for(var i=0; i < db.weapons.length; i++) {
+		if(db.weapons[i].buymenu == menuselection) {
+			//found an entry with that buycmd
+			var itemname = db.weapons[i].itemname;
+			//check if we are eligible to buy it
+			if((db.weapons[i].onlyteam == "") || (db.weapons[i].onlyteam == team)) {
+				console.log("Buyhandler: Found " + itemname);
+				if(db.weapons[i].buydisabled == false) {
+					foundweapons.push(db.weapons[i]);
+				} else {
+					//buying disabled after choices were made about the loadout
+					console.log("Buyhandler: Buying was disabled on that item: " + itemname);
+				}
+			} else {
+				//we are in the wrong team to buy this
+				console.log("Buyhandler: Item: " + itemname + " is restricted to team: " + db.weapons[i].onlyteam);
+			}
+		}
+	}
+	
+	if(foundweapons.length == 1) {
+		var itempic = new Image();
+		var itemname = foundweapons[0].itemname;
+		var clearname = foundweapons[0].clearname;
+		itempic.src = "weaponequipbyname/" + itemname + ".jpg";
+		//document.getElementById("lastbuypic").innerHTML = '<img src="' + itempic.src + '" id="lastbuypic">';
+		//document.getElementById("lastbuytext").innerHTML = '<b>' + clearname + '</b>';
+
+		return true;
+	} else if(foundweapons.length > 1) {
+		//let the user select their loadout
+		//resolveLoadoutConflict(foundweapons);
+		
+		//what do I return?
+		//I should have only one single gun leftover after the whole process.. Add that weapon to the users' inventory.
+		return false;
+	}
+	//parse all found weapons and post them as pics in the lastbuy tablerow.
+	/*
+			var itempic = new Image();
+			itempic.src = "weaponequipbyname/" + itemname + ".jpg";
+			document.getElementById("lastbuy").innerHTML = '<b>' + itemname + '</b> <img src="' + itempic.src + '" id="lastbuypic">';
+			return true;
+	*/
+	return false;
+}
+
+document.addEventListener('keypress', function(event){
+	if((event.key >= '1') && (event.key <= '6')) {
+		//console.log("You pressed a number: " + event.key);
+		if(currentmenu.length >= 1) { 
+			currentmenu += event.key;
+		}
+	} else if(event.key == 'b') {
+		//open or close buymenu
+		if((currentmenu.length > 0) || (currentmenu == "m")) { 
+			currentmenu = "";
+		} else {
+			currentmenu = "b";
+		}
+		//console.log("You pressed BUY");
+	} else if(event.key == 'm') {
+		//console.log("You pressed TEAM");
+		currentmenu = "m";
+	} else {
+		if(keydebug == true) {
+			console.log("Pressed keycode: " + event.keyCode);
+			console.log("Key: " + event.key);
+		}
+	}
+	
+	
+	//menuhandler();
+	
+} );
+
+document.addEventListener('keyup', function(event){
+	if(event.key == 'Escape') {
+		//console.log("You pressed Escape");
+		if(currentmenu.length >= 1) { 
+			currentmenu = 	currentmenu.substring(0, currentmenu.length - 1); //remove last char
+			console.log("ESC: Going back to Menu: " + currentmenu);
+			//menuhandler();	
+		}
+
+	} else if(event.key == 'Backspace') {
+		//console.log("You pressed Backspace");
+	} else {
+		if(keydebug == true) {
+			console.log("Pressed keycode: " + event.keyCode);
+			console.log("Key: " + event.key);
+		}
+	}	
+	
+	
+} );
+
+function listallitems() {
+	var outputdiv = document.getElementById("itemlist");
+	outputdiv.innerHTML = ""; //clear output
+	for(var i=0; i < db.weapons.length; i++) {
+		outputdiv.innerHTML += getItemImg(db.weapons[i].itemname, db.weapons[i].clearname);
+	}
+
+}
+
+</script>
+
+	<div id="circledivcontainer"></div>
+	<div id="teamselectpicdiv" align=center></div>

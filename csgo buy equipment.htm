@@ -1,0 +1,151 @@
+<head>
+<style>
+
+.circlepicdivclass {
+	position: relative;
+	width: 439px;
+	height: 439px;
+	border-radius: 50%;
+	overflow: hidden;
+}
+
+
+.circlepicclass {
+	position:absolute;
+	top:-159px;
+	left:-75px;
+}
+
+.itempicclass {
+	border: 1px solid black;
+	border-radius: 20%;
+}
+
+.teamselectclass {
+	border: 1px solid black;;
+	border-radius: 50px;
+}
+
+.textinput {
+	border: 1px solid black;
+	width: 100%;
+    background-color:rgba(100, 100, 100, 0.1);
+    color:black;
+    outline:none;
+    height:30px;
+    transition:height 1s;
+    -webkit-transition:height 1s;
+}
+.textinput:focus {
+    height:30px;
+    font-size:16px;
+}
+
+#copyrighttext {
+	color: darkgray;
+	font-size: 10;
+	position: fixed;
+	bottom: 0;
+	right: 0;
+}
+</style>
+</head>
+
+<script src="itemdbjson.js"></script>
+<script>
+db = JSON.parse(rawjson); //access like: db.weapons[0].itemname;
+
+var team = "ct"; //standard: CT
+var costs = 0; //sum up the costs for a kit
+
+var carry = new Array(); //contains objects of items that the user chose to carry with them
+
+
+window.addEventListener('load', function(event) {
+	//menuhandler();
+	//document.getElementById("thebody").style.background	= 'radial-gradient(darkgray 30%, black 70%, black)'; //default background
+	searchAndList("");
+} );
+
+
+function searchAndList(pattern) {
+	pattern = pattern.toLowerCase();
+	//console.log("Searchandlist: running with pattern: " + pattern);
+	var outputdiv = document.getElementById("itemlist");
+	outputdiv.innerHTML = ""; //clear output
+	
+	var resultbundle = "";
+	for(var i=0; i < db.weapons.length; i++) {
+		
+		if(db.weapons[i].itemname.toLowerCase().includes(pattern) ||
+			db.weapons[i].clearname.toLowerCase().includes(pattern) ||
+			db.weapons[i].buycmd.includes(pattern) ||
+			(db.weapons[i].buymenu.includes(pattern) && (db.weapons[i].buymenu != "")) ||
+			db.weapons[i].price.toString() == pattern) {
+			resultbundle += createItemListing(db.weapons[i].itemname);
+		}
+	}
+	outputdiv.innerHTML = resultbundle;
+
+}
+
+function searchInputChanged(pattern) {
+  searchAndList(pattern);
+}
+
+function createItemListing(itemname) {
+	//create an inline displayable HTML tag, that displays an item
+	//we work with inline-block tables.
+	var item = getDBobjectByname(itemname);
+
+	var pricetagcolor = "darkgreen";
+	if(item.buydisabled == true) {
+		pricetagcolor = "darkred";
+	}
+
+	var listing = '<table style="display: inline-block;"><tr><td align=center>' +
+		getItemImg(itemname) +
+		'</td></tr>' +
+		'<tr><td bgcolor=darkgray style="border-radius:5px" align=center><font color=black>' +
+		item.clearname +
+		'</font></td></tr>' + 
+		'<tr><td bgcolor=darkgray style="border-radius:5px" align=center><font color="' + pricetagcolor + '" id="pricetag">' + 
+		'$ ' + item.price + '</font><td></tr></table>';
+		
+
+	return listing;
+}
+
+function getDBobjectByname(itemname) {
+	var item = db.weapons.find(obj => {
+		return (obj.itemname === itemname)
+	});
+	return item;
+}
+
+function getItemImg(itemname) {
+	//console.log("getItemImg: " + itemname);
+	//var clearname = db.weapons.indexOf(itemname).clearname;
+	var item = getDBobjectByname(itemname);
+	var clearname = item.clearname;
+	
+	//console.log("getItemImg: clearname: " + clearname);
+	var itempic = new Image();
+	itempic.src = "weaponequipbyname/" + itemname + ".jpg";
+	imgtag = '<img src="' + itempic.src + '" id="' + itemname + 'pic" width=100 height=90 alt="' + clearname + '" title="' + clearname + '" class="itempicclass">';
+	return imgtag;
+}
+
+
+
+</script>
+<body id=thebody>
+	<div id="carrycontainer"></div>
+
+	<br>
+	<input type="text" class="textinput" name="itemsearch" value="" placeholder="Search items. Examples: ak, 47, b42" onchange="searchInputChanged(this.value)" onkeyup="searchInputChanged(this.value)">
+	<hr>
+
+	<div id="itemlist"></div>
+	<p id=copyrighttext>&copy; 2019 CSGOBuyEquipment Some Rights Reserved</p>
+</body>
