@@ -11,15 +11,15 @@ var rawjson = '{"weapons":[' +
 '{"itemname":"elite","clearname":"Dual Elites","buycmd":"elite", "price":400, "buymenu":"b12", "onlyteam":"", "slot":"2", "candrop":true, "buydisabled":false},' +
 '{"itemname":"p250","clearname":"P250","buycmd":"p250", "price":300, "buymenu":"b13", "onlyteam":"", "slot":"2", "candrop":true, "buydisabled":false},' +
 '{"itemname":"fn57","clearname":"FN Five-SeveN","buycmd":"fn57", "price":500, "buymenu":"b14", "onlyteam":"ct", "slot":"2", "candrop":true, "buydisabled":false},' +
-'{"itemname":"tec9","clearname":"Tec-9","buycmd":"tec9", "price":500, "buymenu":"b14", "tonly":true, "onlyteam":"t", "slot":"2", "candrop":true, "buydisabled":false},' +
-'{"itemname":"cz75","clearname":"CZ75-Auto","buycmd":"tec9", "price":500, "buymenu":"b14", "tonly":true, "onlyteam":"t", "slot":"2", "candrop":true, "buydisabled":false},' +
+'{"itemname":"tec9","clearname":"Tec-9","buycmd":"tec9", "price":500, "buymenu":"b14", "onlyteam":"t", "slot":"2", "candrop":true, "buydisabled":false},' +
+'{"itemname":"cz75","clearname":"CZ75-Auto","buycmd":"tec9", "price":500, "buymenu":"b14", "onlyteam":"t", "slot":"2", "candrop":true, "buydisabled":false},' +
 '{"itemname":"deagle","clearname":"Desert Eagle","buycmd":"deagle", "price":700, "buymenu":"b15", "onlyteam":"", "slot":"2", "candrop":true, "buydisabled":false},' +
 '{"itemname":"r8","clearname":"R8 Revolver","buycmd":"deagle", "price":600, "buymenu":"b15", "onlyteam":"", "slot":"2", "candrop":true, "buydisabled":false},' +
 
 '{"itemname":"nova","clearname":"Nova","buycmd":"nova", "price":1050, "buymenu":"b21", "onlyteam":"", "slot":"1", "candrop":true, "buydisabled":false},' +
 '{"itemname":"xm1014","clearname":"XM1014","buycmd":"xm1014", "price":2000, "buymenu":"b22", "onlyteam":"", "slot":"1", "candrop":true, "buydisabled":false},' +
 '{"itemname":"mag7","clearname":"MAG-7","buycmd":"mag7", "price":1300, "buymenu":"b23", "onlyteam":"ct", "slot":"1", "candrop":true, "buydisabled":false},' +
-'{"itemname":"sawedoff","clearname":"Sawed-Off","buycmd":"mag7", "price":1100, "buymenu":"b23", "tonly":true, "onlyteam":"t", "slot":"1", "candrop":true, "buydisabled":false},' +
+'{"itemname":"sawedoff","clearname":"Sawed-Off","buycmd":"mag7", "price":1100, "buymenu":"b23", "onlyteam":"t", "slot":"1", "candrop":true, "buydisabled":false},' +
 '{"itemname":"m249","clearname":"M249 LMG","buycmd":"m249", "price":5200, "buymenu":"b24", "onlyteam":"", "slot":"1", "candrop":true, "buydisabled":false},' +
 '{"itemname":"negev","clearname":"Negev","buycmd":"", "price":1700, "buymenu":"b25", "onlyteam":"", "slot":"1", "candrop":true, "buydisabled":false},' +
 

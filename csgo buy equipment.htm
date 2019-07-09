@@ -1,19 +1,48 @@
 <head>
 <style>
-
-.circlepicdivclass {
-	position: relative;
-	width: 439px;
-	height: 439px;
-	border-radius: 50%;
-	overflow: hidden;
+body {
+	color: gray; /* general text color */
 }
 
+input[type=text] {
+	border: 1px solid black;
+    background-color:rgba(100, 100, 100, 0.1);
+    color:gray;
 
-.circlepicclass {
-	position:absolute;
-	top:-159px;
-	left:-75px;
+}
+
+.slider {
+    -webkit-appearance: none;
+    width: 40%;
+    height: 15px;
+    border-radius: 5px;
+    background: #d3d3d3;
+    outline: none;
+    opacity: 0.7;
+    -webkit-transition: opacity .15s ease-in-out;
+    transition: opacity .15s ease-in-out;
+}
+
+.slider:hover {
+  opacity: 1;
+}
+
+.slider::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 25px;
+  height: 25px;
+  border-radius: 50%;
+  background: #4CAF50;
+  cursor: pointer;
+}
+
+.slider::-moz-range-thumb {
+  width: 25px;
+  height: 25px;
+  border-radius: 50%;
+  background: #4CAF50;
+  cursor: pointer;
 }
 
 .itempicclass {
@@ -27,16 +56,16 @@
 }
 
 .textinput {
-	border: 1px solid black;
-	width: 100%;
-    background-color:rgba(100, 100, 100, 0.1);
-    color:black;
-    outline:none;
+    //outline:none;
     height:30px;
+	width: 100%;
     transition:height 1s;
     -webkit-transition:height 1s;
 }
+
+
 .textinput:focus {
+	color: lightgray;
     height:30px;
     font-size:16px;
 }
@@ -55,16 +84,26 @@
 <script>
 db = JSON.parse(rawjson); //access like: db.weapons[0].itemname;
 
-var team = "ct"; //standard: CT
-var costs = 0; //sum up the costs for a kit
+//var costs = 0; //sum up the costs for a kit. Can be calculated from the carry array.
+
+var searchFilter = new Map(); //use different filter options to search items in the DB.
 
 var carry = new Array(); //contains objects of items that the user chose to carry with them
 
+var defaultBGgradient = 'radial-gradient(darkgray 5%, black 40%, black)';
 
 window.addEventListener('load', function(event) {
-	//menuhandler();
-	//document.getElementById("thebody").style.background	= 'radial-gradient(darkgray 30%, black 70%, black)'; //default background
+	document.getElementById("thebody").style.background	= defaultBGgradient;
+	//document.getElementById("thebody").style.background	= 'radial-gradient(#32404b 30%, #0c1417 70%, black)'; //CT background
+	
+	//for debug, let's configure the search filters static overe here
+	searchFilter.set("team", "ct"); //can be "ct", "t" or "both"
+	searchFilter.set("showdisabled", false);
+	searchFilter.set("maxprice", 5000);
+	
 	searchAndList("");
+	
+	sliderChanged(5000);
 } );
 
 
@@ -76,6 +115,26 @@ function searchAndList(pattern) {
 	
 	var resultbundle = "";
 	for(var i=0; i < db.weapons.length; i++) {
+		//apply search-filtering
+		
+		/*
+			Filter by team. Filter can be set to "ct", "t" or "both".
+			The items have an onlyteam field with "ct" or "t", if they are restricted to the respective team,
+			or an empty string "", when the item is not team restricted
+		*/
+		if((searchFilter.get("team") != "both") && (db.weapons[i].onlyteam != "")) {
+			if(searchFilter.get("team") != db.weapons[i].onlyteam) {
+				//console.log("Filter: " + searchFilter.get("team") + " -- Item.onlyteam: " + db.weapons[i].onlyteam + " Item: " + db.weapons[i].itemname);
+				continue; //skipping this loop iteration
+			}
+		}
+		if((searchFilter.get("showdisabled") == false) && (db.weapons[i].buydisabled == true)) {
+			//console.log("Filter: showdisabled:" + searchFilter.get("showdisabled") + " -- Item.buydisabled: " + db.weapons[i].buydisabled);
+			continue;
+		}
+		if(db.weapons[i].price > searchFilter.get("maxprice")) {
+			continue;
+		}
 		
 		if(db.weapons[i].itemname.toLowerCase().includes(pattern) ||
 			db.weapons[i].clearname.toLowerCase().includes(pattern) ||
@@ -89,8 +148,9 @@ function searchAndList(pattern) {
 
 }
 
-function searchInputChanged(pattern) {
-  searchAndList(pattern);
+function searchInputChanged() {
+	var pattern = document.getElementById("itemsearch").value;
+	searchAndList(pattern);
 }
 
 function createItemListing(itemname) {
@@ -136,14 +196,42 @@ function getItemImg(itemname) {
 	return imgtag;
 }
 
+function sliderChanged(newmaxprice) {
+	document.getElementById("maxpriceinput").value = "$" + newmaxprice;
+	searchFilter.set("maxprice", newmaxprice);
+	searchInputChanged(); //re-run the item search
+}
 
+function teamselectorChanged(team) {
+	if(team == "ct") {
+		document.getElementById("thebody").style.background	= 'radial-gradient(#32404b 30%, #0c1417 50%, black)'; //CT background
+	} else if (team == "t") {
+		document.getElementById("thebody").style.background	= 'radial-gradient(#6d6242 30%, #20180d 70%, black)'; //T background
+	} else {
+		document.getElementById("thebody").style.background	= defaultBGgradient; //default background
+	}
+
+	//document.getElementById("thebody").style.background	= 'radial-gradient(darkgray 30%, black 70%, black)'; //default background
+	//document.getElementById("thebody").style.background	= 'radial-gradient(#6d6242 30%, #20180d 70%, black)'; //T background
+	//document.getElementById("thebody").style.background	= 'radial-gradient(#32404b 30%, #0c1417 70%, black)'; //CT background
+
+	searchFilter.set("team",team);
+	searchInputChanged(); //re-run the item search
+}
 
 </script>
 <body id=thebody>
 	<div id="carrycontainer"></div>
 
 	<br>
-	<input type="text" class="textinput" name="itemsearch" value="" placeholder="Search items. Examples: ak, 47, b42" onchange="searchInputChanged(this.value)" onkeyup="searchInputChanged(this.value)">
+	<input type="text" class="textinput" name="itemsearch" id="itemsearch" value="" placeholder="Search items. Examples: ak, 47, b42" onchange="searchInputChanged()" onkeyup="searchInputChanged()">
+	<br>
+	<input type="radio" name="teamselect" id="ct" value="ct" onchange="teamselectorChanged(this.value)"><label for="ct">CT&nbsp;&nbsp;</label>
+	<input type="radio" name="teamselect" id="t" value="t" onchange="teamselectorChanged(this.value)"><label for="t">T&nbsp;&nbsp;</label>
+	<input type="radio" name="teamselect" id="both" value="both" onchange="teamselectorChanged(this.value)" checked><label for="both">both&nbsp;&nbsp;</label>
+	<br>
+	Max Money: <input type="text" id="maxpriceinput" size=5 readonly>   
+	$50<input type="range" min="1" max="100" value="1000" class="slider" onchange="sliderChanged(this.value*50)" oninput="sliderChanged(this.value*50)">$5000
 	<hr>
 
 	<div id="itemlist"></div>
