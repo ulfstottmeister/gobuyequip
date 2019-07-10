@@ -8,6 +8,13 @@ body {
 	/* height: 150px; */ /* default value when the page loads.. should be altered as the carry items change*/
 }
 
+.sum {
+    background-color:rgba(100, 100, 100, 0.1);
+    color:darkgreen;
+	font-size: 25px;
+	font-weight: bold;
+}
+
 .remove {
 	display: block;
 	width: 100%;
@@ -86,6 +93,11 @@ input[type=text] {
 
 .itempicclass {
 	border: 1px solid black;
+	border-radius: 20%;
+}
+
+.itempicclass:hover {
+	border: 1px solid darkgreen;
 	border-radius: 20%;
 }
 
@@ -262,48 +274,102 @@ function upTo(el, tagName) {
 }
 
 function clickOnCarryDropListingHandler(button, itemname) {
+	var parentdiv = upTo(button, "div");
+	
 	if(button.value == "remove") {
+		if(parentdiv.id == "carrycontainer") {
+			removeFromCarry(button, itemname);
+		} else if(parentdiv.id == "droppedcontainer") {
+			removeFromDropped(button, itemname);
+		}
+	}
+	else if(button.value == "drop") {
 		removeFromCarry(button, itemname);
+		addToDropped(itemname);
 	}
-	if(button.value == "pick up") {
-		console.log("pick up!");
-	}
-	if(button.value == "drop") {
-		console.log("drop!");
+	else if(button.value == "pick up") {
+		removeFromDropped(button, itemname);
+		addToCarry(itemname);
 	}
 }
 
 
 function carryChanged() {
-	console.log("Carry Changed!");
+	//actually: carryDroppedChanged
+	
+	//handle visual representations based on arrays
+	document.getElementById("carrycontainer").innerHTML = "";
+
+	//add visuals
+	for(var i=0; i < carry.length; i++) {
+		document.getElementById("carrycontainer").innerHTML += itemnameToCarryListing(carry[i]);
+	}
+
+	document.getElementById("droppedcontainer").innerHTML = "";
+
+	//add visuals
+	for(var i=0; i < dropped.length; i++) {
+		console.log("carryChanged Loop...");
+		console.log(dropped[i]);
+		if(dropped[i] == undefined) {
+			console.log("carryChanged: ERROR: undefined Array entry at dropped["+ i + "]");
+			continue;
+		}
+		document.getElementById("droppedcontainer").innerHTML += itemnameToDropListing(dropped[i]);
+	}
+
 	//recalculate total costs of set
 	var sumOfCosts = 0;
 	for(var i=0; i < carry.length; i++) {
 		sumOfCosts += getDBobjectByname(carry[i]).price;
 	}
-	console.log("Costs: " + sumOfCosts);
+	for(var i=0; i < dropped.length; i++) {
+		sumOfCosts += getDBobjectByname(dropped[i]).price;
+	}
+
+	console.log("carryChanged: Costs: " + sumOfCosts);
+	document.getElementById("sum").innerHTML = "Sum: $ " + sumOfCosts;
 }
 
 function addToCarry(itemname) {
-	document.getElementById("carrycontainer").innerHTML += itemnameToCarryListing(itemname);
+	var newitem = getDBobjectByname(itemname);
+	if(newitem == undefined) {
+		console.log("addToCarry: Error. item Undefined.");
+	}
 	carry.push(itemname);
 	carryChanged();
 }
 
-function removeFromCarry(button, itemname) {
-	//remove visual representation
-	var parenttable = upTo(button, "table");
-	var parentdiv = upTo(parenttable, "div");
-	parentdiv.removeChild(parenttable); //remove listing
+function addToDropped(itemname) {
+	var newitem = getDBobjectByname(itemname);
+	if(newitem == undefined) {
+		console.log("addToDropped: Error. item Undefined.");
+	}
+	dropped.push(itemname);
+	carryChanged();
+}
 
+
+function removeFromCarry(button, itemname) {
 	//remove "itemname" from carry Array.
 	var itemInArray = carry.indexOf(itemname); //find index in Array
 	if(itemInArray >= 0) {
 		carry.splice(itemInArray, 1); //remove from Array
 	}
-	
+
 	carryChanged();
 }
+
+function removeFromDropped(button, itemname) {
+	//remove "itemname" from dropped Array.
+	var itemInArray = dropped.indexOf(itemname); //find index in Array
+	if(itemInArray >= 0) {
+		dropped.splice(itemInArray, 1); //remove from Array
+	}
+
+	carryChanged();
+}
+
 
 function clickOnItemHandler(listing, itemname) {
 	//console.log(listing.parentNode);
@@ -391,6 +457,8 @@ function teamselectorChanged(team) {
 </script>
 <body id=thebody>
 	<div id="carrycontainer" class="carry">&nbsp;</div>
+	<div id="droppedcontainer" class="dropped">&nbsp;</div>
+	<p class="sum" id="sum"></p>
 
 	<br>
 	<input type="text" class="textinput" name="itemsearch" id="itemsearch" value="" placeholder="Search items. Examples: ak, 47, b42" onchange="searchInputChanged()" onkeyup="searchInputChanged()">
