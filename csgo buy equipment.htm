@@ -4,11 +4,38 @@ body {
 	color: gray; /* general text color */
 }
 
+.carry {
+	/* height: 150px; */ /* default value when the page loads.. should be altered as the carry items change*/
+}
+
+.block {
+	display: block;
+	width: 100%;
+	border: none;
+	background-color: #cc0000;
+	//padding: 14px 28px;
+	font-size: 16px;
+	cursor: pointer;
+	text-align: center;
+}
+
 input[type=text] {
-	border: 1px solid black;
+	border: 1px solid gray;
     background-color:rgba(100, 100, 100, 0.1);
     color:gray;
 
+}
+
+.teamselectorb {
+	width:30px;
+	height:30px;
+	opacity: 0.7;
+}
+
+.teamselectorb:hover {
+	width:35px;
+	height:35px;
+	opacity: 1;
 }
 
 .slider {
@@ -50,13 +77,8 @@ input[type=text] {
 	border-radius: 20%;
 }
 
-.teamselectclass {
-	border: 1px solid black;;
-	border-radius: 50px;
-}
 
 .textinput {
-    //outline:none;
     height:30px;
 	width: 100%;
     transition:height 1s;
@@ -97,7 +119,7 @@ window.addEventListener('load', function(event) {
 	//document.getElementById("thebody").style.background	= 'radial-gradient(#32404b 30%, #0c1417 70%, black)'; //CT background
 	
 	//for debug, let's configure the search filters static overe here
-	searchFilter.set("team", "ct"); //can be "ct", "t" or "both"
+	searchFilter.set("team", "both"); //can be "ct", "t" or "both"
 	searchFilter.set("showdisabled", false);
 	searchFilter.set("maxprice", 5000);
 	
@@ -153,6 +175,86 @@ function searchInputChanged() {
 	searchAndList(pattern);
 }
 
+function itemnameToCarryListing(itemname) {
+	var carrylisting = "<table style='display: inline-block;'><tr><td align=center>";
+	carrylisting += createItemListing(itemname);
+	carrylisting += "</td><tr><td align=center>";
+	carrylisting += "<input type=button value='delete' onclick=clickOnCarryListingHandler(this,\'" + itemname + "\') class=block>";
+	carrylisting += "</td></tr></table>";
+	return carrylisting;
+}
+
+function upTo(el, tagName) {
+	//find parentNode of certain tag
+	tagName = tagName.toLowerCase();
+
+	while (el && el.parentNode) {
+		el = el.parentNode;
+		if (el.tagName && el.tagName.toLowerCase() == tagName) {
+			return el;
+		}
+	}
+
+	// Many DOM methods return null if they don't 
+	// find the element they are searching for
+	// It would be OK to omit the following and just
+	// return undefined
+	return null;
+}
+function clickOnCarryListingHandler(button, itemname) {
+	if(button.value == "delete") {
+		removeFromCarry(button, itemname);
+	}
+}
+
+function carryChanged() {
+	console.log("Carry Changed!");
+	//recalculate total costs of set
+	var sumOfCosts = 0;
+	for(var i=0; i < carry.length; i++) {
+		sumOfCosts += getDBobjectByname(carry[i]).price;
+	}
+	console.log("Costs: " + sumOfCosts);
+}
+
+function addToCarry(itemname) {
+	document.getElementById("carrycontainer").innerHTML += itemnameToCarryListing(itemname);
+	carry.push(itemname);
+	carryChanged();
+}
+
+function removeFromCarry(button, itemname) {
+	//remove visual representation
+	var parenttable = upTo(button, "table");
+	var parentdiv = upTo(parenttable, "div");
+	parentdiv.removeChild(parenttable); //remove listing
+
+	//remove "itemname" from carry Array.
+	var itemInArray = carry.indexOf(itemname); //find index in Array
+	if(itemInArray >= 0) {
+		carry.splice(itemInArray, 1); //remove from Array
+	}
+	
+	carryChanged();
+}
+
+function clickOnItemHandler(listing, itemname) {
+	//console.log(listing.parentNode);
+	var parentdiv = upTo(listing, "div");
+	
+	if(parentdiv.id == "itemlist") {
+		//console.log("Clicked on the search listing.");
+		//invoke buy? no, add to carry. We don't buy. We just sum up carry value.
+		addToCarry(itemname);
+	}
+	if(parentdiv.id == "carrycontainer") {
+		//console.log("Clicked on equipment. Got our own handler here.");
+	}
+	//console.log("parentNode: " + listing.parentNode.id);
+	//console.log(listing);
+	//console.log(itemname);
+}
+
 function createItemListing(itemname) {
 	//create an inline displayable HTML tag, that displays an item
 	//we work with inline-block tables.
@@ -163,7 +265,7 @@ function createItemListing(itemname) {
 		pricetagcolor = "darkred";
 	}
 
-	var listing = '<table style="display: inline-block;"><tr><td align=center>' +
+	var listing = '<table style="display: inline-block;" onclick="clickOnItemHandler(this, \'' + itemname + '\')"><tr><td align=center>' +
 		getItemImg(itemname) +
 		'</td></tr>' +
 		'<tr><td bgcolor=darkgray style="border-radius:5px" align=center><font color=black>' +
@@ -221,14 +323,14 @@ function teamselectorChanged(team) {
 
 </script>
 <body id=thebody>
-	<div id="carrycontainer"></div>
+	<div id="carrycontainer" class="carry">&nbsp;</div>
 
 	<br>
 	<input type="text" class="textinput" name="itemsearch" id="itemsearch" value="" placeholder="Search items. Examples: ak, 47, b42" onchange="searchInputChanged()" onkeyup="searchInputChanged()">
 	<br>
-	<input type="radio" name="teamselect" id="ct" value="ct" onchange="teamselectorChanged(this.value)"><label for="ct">CT&nbsp;&nbsp;</label>
-	<input type="radio" name="teamselect" id="t" value="t" onchange="teamselectorChanged(this.value)"><label for="t">T&nbsp;&nbsp;</label>
-	<input type="radio" name="teamselect" id="both" value="both" onchange="teamselectorChanged(this.value)" checked><label for="both">both&nbsp;&nbsp;</label>
+	<input type="radio" name="teamselect" id="ct" value="ct" onchange="teamselectorChanged(this.value)" hidden><label for="ct"><img src="menupix/ct_orb.png" alt="CT" title="CT" class="teamselectorb"></label>
+	<input type="radio" name="teamselect" id="t" value="t" onchange="teamselectorChanged(this.value)" hidden><label for="t"><img src="menupix/t_orb.png" alt="T" title="T" class="teamselectorb"></label>
+	<input type="radio" name="teamselect" id="both" value="both" onchange="teamselectorChanged(this.value)" checked hidden><label for="both"><img src="menupix/both_orb.png" alt="both" title="both" class="teamselectorb"></label>
 	<br>
 	Max Money: <input type="text" id="maxpriceinput" size=5 readonly>   
 	$50<input type="range" min="1" max="100" value="1000" class="slider" onchange="sliderChanged(this.value*50)" oninput="sliderChanged(this.value*50)">$5000
