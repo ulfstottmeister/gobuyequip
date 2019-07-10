@@ -274,8 +274,14 @@ function upTo(el, tagName) {
 }
 
 function clickOnCarryDropListingHandler(button, itemname) {
+	var parentdiv = upTo(button, "div");
+	
 	if(button.value == "remove") {
-		removeFromCarry(button, itemname);
+		if(parentdiv.id == "carrycontainer") {
+			removeFromCarry(button, itemname);
+		} else if(parentdiv.id == "droppedcontainer") {
+			removeFromDropped(button, itemname);
+		}
 	}
 	else if(button.value == "drop") {
 		removeFromCarry(button, itemname);
@@ -299,9 +305,6 @@ function carryChanged() {
 		document.getElementById("carrycontainer").innerHTML += itemnameToCarryListing(carry[i]);
 	}
 
-	
-
-
 	document.getElementById("droppedcontainer").innerHTML = "";
 
 	//add visuals
@@ -314,10 +317,6 @@ function carryChanged() {
 		}
 		document.getElementById("droppedcontainer").innerHTML += itemnameToDropListing(dropped[i]);
 	}
-
-
-
-
 
 	//recalculate total costs of set
 	var sumOfCosts = 0;
