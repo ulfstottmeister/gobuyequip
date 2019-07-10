@@ -8,7 +8,7 @@ body {
 	/* height: 150px; */ /* default value when the page loads.. should be altered as the carry items change*/
 }
 
-.block {
+.remove {
 	display: block;
 	width: 100%;
 	border: none;
@@ -18,6 +18,18 @@ body {
 	cursor: pointer;
 	text-align: center;
 }
+
+.droppickup {
+	display: block;
+	width: 100%;
+	border: none;
+	background-color: #cccccc;
+	//padding: 14px 28px;
+	font-size: 16px;
+	cursor: pointer;
+	text-align: center;
+}
+
 
 input[type=text] {
 	border: 1px solid gray;
@@ -111,6 +123,7 @@ db = JSON.parse(rawjson); //access like: db.weapons[0].itemname;
 var searchFilter = new Map(); //use different filter options to search items in the DB.
 
 var carry = new Array(); //contains objects of items that the user chose to carry with them
+var dropped = new Array(); //items which the player dropped to the floor for his team mates
 
 var defaultBGgradient = 'radial-gradient(darkgray 5%, black 40%, black)';
 
@@ -177,12 +190,58 @@ function searchInputChanged() {
 
 function itemnameToCarryListing(itemname) {
 	var carrylisting = "<table style='display: inline-block;'><tr><td align=center>";
-	carrylisting += createItemListing(itemname);
+	
+	
+	//create Itemlisting -- but slightly different from the createItemListing()
+	var item = getDBobjectByname(itemname);
+	var pricetagcolor = "darkgreen";
+	if(item.buydisabled == true) {
+		pricetagcolor = "darkred";
+	}
+	var listing = '<table style="display: inline-block; cursor: default;" onmouseover=""><tr><td align=center>' +
+		getItemImg(itemname) +
+		'</td></tr>' +
+		'<tr><td bgcolor=darkgray style="border-radius:5px" align=center><font color=black>' +
+		item.clearname +
+		'</font></td></tr>' + 
+		'<tr><td bgcolor=darkgray style="border-radius:5px" align=center><font color="' + pricetagcolor + '" id="pricetag">' + 
+		'$ ' + item.price + '</font><td></tr></table>';
+
+	carrylisting += listing;
 	carrylisting += "</td><tr><td align=center>";
-	carrylisting += "<input type=button value='delete' onclick=clickOnCarryListingHandler(this,\'" + itemname + "\') class=block>";
+	carrylisting += "<input type=button value='drop' onclick=clickOnCarryDropListingHandler(this,\'" + itemname + "\') class=droppickup>";
+	carrylisting += "<input type=button value='remove' onclick=clickOnCarryDropListingHandler(this,\'" + itemname + "\') class=remove>";
 	carrylisting += "</td></tr></table>";
 	return carrylisting;
 }
+
+function itemnameToDropListing(itemname) {
+	var droplisting = "<table style='display: inline-block;'><tr><td align=center>";
+	
+	
+	//create Itemlisting -- but slightly different from the createItemListing()
+	var item = getDBobjectByname(itemname);
+	var pricetagcolor = "darkgreen";
+	if(item.buydisabled == true) {
+		pricetagcolor = "darkred";
+	}
+	var listing = '<table style="display: inline-block; cursor: default;" onmouseover=""><tr><td align=center>' +
+		getItemImg(itemname) +
+		'</td></tr>' +
+		'<tr><td bgcolor=darkgray style="border-radius:5px" align=center><font color=black>' +
+		item.clearname +
+		'</font></td></tr>' + 
+		'<tr><td bgcolor=darkgray style="border-radius:5px" align=center><font color="' + pricetagcolor + '" id="pricetag">' + 
+		'$ ' + item.price + '</font><td></tr></table>';
+
+	droplisting += listing;
+	droplisting += "</td><tr><td align=center>";
+	droplisting += "<input type=button value='pick up' onclick=clickOnCarryDropListingHandler(this,\'" + itemname + "\') class=droppickup>";
+	droplisting += "<input type=button value='remove' onclick=clickOnCarryDropListingHandler(this,\'" + itemname + "\') class=remove>";
+	droplisting += "</td></tr></table>";
+	return droplisting;
+}
+
 
 function upTo(el, tagName) {
 	//find parentNode of certain tag
@@ -201,11 +260,19 @@ function upTo(el, tagName) {
 	// return undefined
 	return null;
 }
-function clickOnCarryListingHandler(button, itemname) {
-	if(button.value == "delete") {
+
+function clickOnCarryDropListingHandler(button, itemname) {
+	if(button.value == "remove") {
 		removeFromCarry(button, itemname);
 	}
+	if(button.value == "pick up") {
+		console.log("pick up!");
+	}
+	if(button.value == "drop") {
+		console.log("drop!");
+	}
 }
+
 
 function carryChanged() {
 	console.log("Carry Changed!");
@@ -265,7 +332,7 @@ function createItemListing(itemname) {
 		pricetagcolor = "darkred";
 	}
 
-	var listing = '<table style="display: inline-block;" onclick="clickOnItemHandler(this, \'' + itemname + '\')"><tr><td align=center>' +
+	var listing = '<table style="display: inline-block; cursor: pointer;" onclick="clickOnItemHandler(this, \'' + itemname + '\')"  onmouseover=""><tr><td align=center>' +
 		getItemImg(itemname) +
 		'</td></tr>' +
 		'<tr><td bgcolor=darkgray style="border-radius:5px" align=center><font color=black>' +
@@ -332,7 +399,7 @@ function teamselectorChanged(team) {
 	<input type="radio" name="teamselect" id="t" value="t" onchange="teamselectorChanged(this.value)" hidden><label for="t"><img src="menupix/t_orb.png" alt="T" title="T" class="teamselectorb"></label>
 	<input type="radio" name="teamselect" id="both" value="both" onchange="teamselectorChanged(this.value)" checked hidden><label for="both"><img src="menupix/both_orb.png" alt="both" title="both" class="teamselectorb"></label>
 	<br>
-	Max Money: <input type="text" id="maxpriceinput" size=5 readonly>   
+	Max Price: <input type="text" id="maxpriceinput" size=5 readonly>   
 	$50<input type="range" min="1" max="100" value="1000" class="slider" onchange="sliderChanged(this.value*50)" oninput="sliderChanged(this.value*50)">$5000
 	<hr>
 
