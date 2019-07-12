@@ -94,11 +94,14 @@ input[type=text] {
 .itempicclass {
 	border: 1px solid black;
 	border-radius: 20%;
+	opacity: 0.7;
 }
 
 .itempicclass:hover {
 	border: 1px solid darkgreen;
 	border-radius: 20%;
+	opacity: 1;
+
 }
 
 
@@ -146,7 +149,7 @@ window.addEventListener('load', function(event) {
 	//for debug, let's configure the search filters static overe here
 	searchFilter.set("team", "both"); //can be "ct", "t" or "both"
 	searchFilter.set("showdisabled", false);
-	searchFilter.set("maxprice", 5000);
+	searchFilter.set("maxprice", 5200);
 	
 	searchAndList("");
 	
@@ -221,7 +224,9 @@ function itemnameToCarryListing(itemname) {
 
 	carrylisting += listing;
 	carrylisting += "</td><tr><td align=center>";
-	carrylisting += "<input type=button value='drop' onclick=clickOnCarryDropListingHandler(this,\'" + itemname + "\') class=droppickup>";
+	if(item.candrop == true) {
+		carrylisting += "<input type=button value='drop' onclick=clickOnCarryDropListingHandler(this,\'" + itemname + "\') class=droppickup>";
+	}
 	carrylisting += "<input type=button value='remove' onclick=clickOnCarryDropListingHandler(this,\'" + itemname + "\') class=remove>";
 	carrylisting += "</td></tr></table>";
 	return carrylisting;
@@ -282,35 +287,40 @@ function clickOnCarryDropListingHandler(button, itemname) {
 		} else if(parentdiv.id == "droppedcontainer") {
 			removeFromDropped(button, itemname);
 		}
+		carryChanged();
 	}
 	else if(button.value == "drop") {
-		removeFromCarry(button, itemname);
-		addToDropped(itemname);
+		moveFromCarryToDropped(itemname);
+		carryChanged();
 	}
 	else if(button.value == "pick up") {
 		removeFromDropped(button, itemname);
-		addToCarry(itemname);
+		//addToCarry(itemname);
+		playerTakesItem(itemname);
+		carryChanged();
 	}
 }
 
 
 function carryChanged() {
 	//actually: carryDroppedChanged
-	
 	//handle visual representations based on arrays
-	document.getElementById("carrycontainer").innerHTML = "";
 
+	document.getElementById("carrycontainer").innerHTML = "";
 	//add visuals
+	//would be nice to first sort the items by slot and then display them
 	for(var i=0; i < carry.length; i++) {
+		if(carry[i] == undefined) {
+			console.log("carryChanged: ERROR: undefined Array entry at carry["+ i + "]");
+			continue;
+		}
 		document.getElementById("carrycontainer").innerHTML += itemnameToCarryListing(carry[i]);
 	}
 
-	document.getElementById("droppedcontainer").innerHTML = "";
 
+	document.getElementById("droppedcontainer").innerHTML = "";
 	//add visuals
 	for(var i=0; i < dropped.length; i++) {
-		console.log("carryChanged Loop...");
-		console.log(dropped[i]);
 		if(dropped[i] == undefined) {
 			console.log("carryChanged: ERROR: undefined Array entry at dropped["+ i + "]");
 			continue;
@@ -318,17 +328,99 @@ function carryChanged() {
 		document.getElementById("droppedcontainer").innerHTML += itemnameToDropListing(dropped[i]);
 	}
 
-	//recalculate total costs of set
+	//recalculate total costs of set and build buy command string
+	var buycmdstr = "";
 	var sumOfCosts = 0;
-	for(var i=0; i < carry.length; i++) {
-		sumOfCosts += getDBobjectByname(carry[i]).price;
-	}
 	for(var i=0; i < dropped.length; i++) {
+		buycmdstr += "buy " + getDBobjectByname(dropped[i]).buycmd + "; ";
 		sumOfCosts += getDBobjectByname(dropped[i]).price;
 	}
-
-	console.log("carryChanged: Costs: " + sumOfCosts);
+	for(var i=0; i < carry.length; i++) {
+		buycmdstr += "buy " + getDBobjectByname(carry[i]).buycmd + "; ";
+		sumOfCosts += getDBobjectByname(carry[i]).price;
+	}
+	
+	//TODO: let's get the buy string in, when I'm done with the auto-drop feature
+	//console.log("Buy with: " + buycmdstr);
+	//console.log("carryChanged: Costs: " + sumOfCosts);
 	document.getElementById("sum").innerHTML = "Sum: $ " + sumOfCosts;
+}
+
+function playerTakesItem(itemname) {
+	//this function shall evaluate, what happens if a Player would receive a new weapon buy either purchasing or picking it up.
+	//Does it go in the inventory or will it drop on the floor?
+	//This only covers active actions of the player. Not: weapon dropped underneath the player.
+	
+	/* the function can conclude with:
+			-pushing item into carry
+			-moving an old item from carry to dropped while adding a new item to carry
+			-no action at all
+	*/
+	var newitem = getDBobjectByname(itemname);
+	
+	
+	//get items with the same slot or at least one item with the same name
+	var itemsWithSameSlot = new Array();
+	var itemsWithSameName = new Array();
+	for(var i=0; i < carry.length; i++) {
+		var currentitem = getDBobjectByname(carry[i]);
+		if(currentitem.slot == newitem.slot) {
+			itemsWithSameSlot.push(currentitem);
+		}
+		if(currentitem.itemname == newitem.itemname) {
+			itemsWithSameName.push(currentitem);
+		}
+	}
+	
+	//a couple of booleans to make expressions easier.
+	//those expressions are not generally correct; but in their respective context they are.
+	//for example: you first need to check if it's a grenade, before using "haveLessThanFourGrenades"
+	var haveItemsWithSameSlot		= (itemsWithSameSlot.length > 0);
+	var haveItemsWithSameName		= (itemsWithSameName.length > 0);
+	var isDroppable					= (newitem.candrop);
+	var isGrenade					= (newitem.slot == 4);
+	var haveLessThanFourGrenades	= (itemsWithSameSlot.length < 4);
+	var isFlashbang					= (newitem.itemname == "flashbang");
+	var haveLessThanTwoFlashbangs	= (itemsWithSameName.length < 2);
+
+
+	//moveFromCarryToDropped(itemname);
+	//addToCarry(itemname);
+	
+	if(haveItemsWithSameSlot) {
+		if(isDroppable) {
+			console.log("case 1: primary, secondary or taser. Drop and Add.");
+			moveFromCarryToDropped(itemsWithSameSlot[0].itemname);
+			addToCarry(itemname);
+		} else {
+			console.log("case 3: grenades or non-slotted");
+			if(isGrenade) {
+				console.log("case 5: it's a grenade");
+				if(haveLessThanFourGrenades) {
+					console.log("case 6: it's a grenade and we don't have 4 grenades yet");
+					if(!isFlashbang) {
+						console.log("case 7: it's a non-flashbang grenade and we have room. We can add it");
+						addToCarry(itemname);
+					} else {
+						console.log("case 8: it is a flashbang and will only be added, if we don't have two yet");
+						//it is a flashbang
+						if(haveLessThanTwoFlashbangs)
+							addToCarry(itemname);
+					}
+				}
+			} else {
+				console.log("case 4: non-slotted");
+				//what's missing here is upgrading vest to vest+helmet. but I don't really want to do that.
+				//If anything like that: replace vest with vest+helmet and pretend vest was never there.
+				if(haveItemsWithSameName == false)
+					addToCarry(itemname);
+			}
+		}
+	} else {
+		console.log("case 2: add to empty slot.");
+		addToCarry(itemname);
+	}
+	
 }
 
 function addToCarry(itemname) {
@@ -336,6 +428,7 @@ function addToCarry(itemname) {
 	if(newitem == undefined) {
 		console.log("addToCarry: Error. item Undefined.");
 	}
+	console.log("addToCarry: Adding: " + itemname);
 	carry.push(itemname);
 	carryChanged();
 }
@@ -345,10 +438,27 @@ function addToDropped(itemname) {
 	if(newitem == undefined) {
 		console.log("addToDropped: Error. item Undefined.");
 	}
+	console.log("addToDropped: Dropping: " + itemname);
 	dropped.push(itemname);
 	carryChanged();
 }
 
+function moveFromCarryToDropped(itemname) {
+	var item = getDBobjectByname(itemname);
+
+	var itemInArray = carry.indexOf(itemname); //find index in Array
+	if(itemInArray >= 0) {
+		carry.splice(itemInArray, 1); //remove from Array
+	} else {
+		console.log("moveFromCarryToDropped: ERROR: item " + itemname + " not found in carry[]");
+		console.log("moveFromCarryToDropped: Listing carry[]...");
+		console.log(carry);
+		console.log("moveFromCarryToDropped: Listing dropped[]...");
+		console.log(dropped);
+	}
+	dropped.push(itemname);	
+	carryChanged();
+}
 
 function removeFromCarry(button, itemname) {
 	//remove "itemname" from carry Array.
@@ -377,8 +487,8 @@ function clickOnItemHandler(listing, itemname) {
 	
 	if(parentdiv.id == "itemlist") {
 		//console.log("Clicked on the search listing.");
-		//invoke buy? no, add to carry. We don't buy. We just sum up carry value.
-		addToCarry(itemname);
+		playerTakesItem(itemname);
+		carryChanged();
 	}
 	if(parentdiv.id == "carrycontainer") {
 		//console.log("Clicked on equipment. Got our own handler here.");
@@ -468,7 +578,7 @@ function teamselectorChanged(team) {
 	<input type="radio" name="teamselect" id="both" value="both" onchange="teamselectorChanged(this.value)" checked hidden><label for="both"><img src="menupix/both_orb.png" alt="both" title="both" class="teamselectorb"></label>
 	<br>
 	Max Price: <input type="text" id="maxpriceinput" size=5 readonly>   
-	$50<input type="range" min="1" max="100" value="1000" class="slider" onchange="sliderChanged(this.value*50)" oninput="sliderChanged(this.value*50)">$5000
+	$50<input type="range" min="1" max="104" value="104" class="slider" onchange="sliderChanged(this.value*50)" oninput="sliderChanged(this.value*50)">$5200
 	<hr>
 
 	<div id="itemlist"></div>
