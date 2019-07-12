@@ -283,7 +283,7 @@ function clickOnCarryDropListingHandler(button, itemname) {
 	
 	if(button.value == "remove") {
 		if(parentdiv.id == "carrycontainer") {
-			removeFromCarry(button, itemname);
+			removeFromCarry(itemname);
 		} else if(parentdiv.id == "droppedcontainer") {
 			removeFromDropped(button, itemname);
 		}
@@ -362,6 +362,7 @@ function playerTakesItem(itemname) {
 	//get items with the same slot or at least one item with the same name
 	var itemsWithSameSlot = new Array();
 	var itemsWithSameName = new Array();
+	var hasFireGrenade = false;
 	for(var i=0; i < carry.length; i++) {
 		var currentitem = getDBobjectByname(carry[i]);
 		if(currentitem.slot == newitem.slot) {
@@ -369,6 +370,9 @@ function playerTakesItem(itemname) {
 		}
 		if(currentitem.itemname == newitem.itemname) {
 			itemsWithSameName.push(currentitem);
+		}
+		if(currentitem.itemname == "incgrenade" || currentitem.itemname == "molotov") {
+			hasFireGrenade = true;
 		}
 	}
 	
@@ -381,6 +385,7 @@ function playerTakesItem(itemname) {
 	var isGrenade					= (newitem.slot == 4);
 	var haveLessThanFourGrenades	= (itemsWithSameSlot.length < 4);
 	var isFlashbang					= (newitem.itemname == "flashbang");
+	var isFireGrenade				= (newitem.itemname == "incgrenade" || newitem.itemname == "molotov");
 	var haveLessThanTwoFlashbangs	= (itemsWithSameName.length < 2);
 
 
@@ -389,35 +394,54 @@ function playerTakesItem(itemname) {
 	
 	if(haveItemsWithSameSlot) {
 		if(isDroppable) {
-			console.log("case 1: primary, secondary or taser. Drop and Add.");
+			//console.log("case 1: primary, secondary or taser. Drop and Add.");
 			moveFromCarryToDropped(itemsWithSameSlot[0].itemname);
 			addToCarry(itemname);
 		} else {
-			console.log("case 3: grenades or non-slotted");
+			//console.log("case 3: grenades or non-slotted");
 			if(isGrenade) {
-				console.log("case 5: it's a grenade");
+				//console.log("case 5: it's a grenade");
 				if(haveLessThanFourGrenades) {
-					console.log("case 6: it's a grenade and we don't have 4 grenades yet");
+					//console.log("case 6: it's a grenade and we don't have 4 grenades yet");
 					if(!isFlashbang) {
-						console.log("case 7: it's a non-flashbang grenade and we have room. We can add it");
-						addToCarry(itemname);
+						//console.log("case 7: it's a non-flashbang grenade and we have room");
+						if(isFireGrenade) {
+							//console.log("case 9: it's a firegrenade");
+							if(!hasFireGrenade) {
+								//console.log("case 10: we have room for more nades, it's a firegrenade and we don't carry one yet. add it.");
+								addToCarry(itemname);
+							}
+						} else {
+							if(!haveItemsWithSameName) {
+								//console.log("case 11: it's a decoy, HE grende or a smokegrenade. We have room, we don't have one of that kind yet, so: add it.");
+								addToCarry(itemname);
+							}
+						}
 					} else {
-						console.log("case 8: it is a flashbang and will only be added, if we don't have two yet");
+						//console.log("case 8: it is a flashbang and will only be added, if we don't have two yet");
 						//it is a flashbang
 						if(haveLessThanTwoFlashbangs)
 							addToCarry(itemname);
 					}
 				}
 			} else {
-				console.log("case 4: non-slotted");
+				//console.log("case 4: non-slotted");
 				//what's missing here is upgrading vest to vest+helmet. but I don't really want to do that.
 				//If anything like that: replace vest with vest+helmet and pretend vest was never there.
-				if(haveItemsWithSameName == false)
+				if(haveItemsWithSameName == false) {
+					if(itemname.includes("vest")) {
+						//drop any vest before adding the new one
+						//console.log("case 12: vest. drop any and replace with new.");
+						removeFromCarry("vest");
+						removeFromCarry("vesthelm");
+					}
+					//console.log("case 13: other non-slotted item. Defuse Kit, ...");
 					addToCarry(itemname);
+				}
 			}
 		}
 	} else {
-		console.log("case 2: add to empty slot.");
+		//console.log("case 2: add to empty slot.");
 		addToCarry(itemname);
 	}
 	
@@ -428,7 +452,7 @@ function addToCarry(itemname) {
 	if(newitem == undefined) {
 		console.log("addToCarry: Error. item Undefined.");
 	}
-	console.log("addToCarry: Adding: " + itemname);
+	//console.log("addToCarry: Adding: " + itemname);
 	carry.push(itemname);
 	carryChanged();
 }
@@ -438,7 +462,7 @@ function addToDropped(itemname) {
 	if(newitem == undefined) {
 		console.log("addToDropped: Error. item Undefined.");
 	}
-	console.log("addToDropped: Dropping: " + itemname);
+	//console.log("addToDropped: Dropping: " + itemname);
 	dropped.push(itemname);
 	carryChanged();
 }
@@ -460,7 +484,7 @@ function moveFromCarryToDropped(itemname) {
 	carryChanged();
 }
 
-function removeFromCarry(button, itemname) {
+function removeFromCarry(itemname) {
 	//remove "itemname" from carry Array.
 	var itemInArray = carry.indexOf(itemname); //find index in Array
 	if(itemInArray >= 0) {
