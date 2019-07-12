@@ -48,11 +48,11 @@ var rawjson = '{"weapons":[' +
 '{"itemname":"taser","clearname":"Zeus x27","buycmd":"taser", "price":200, "buymenu":"b53", "onlyteam":"", "slot":"3", "candrop":true, "buydisabled":false},' +
 '{"itemname":"defuser","clearname":"Defuse Kit","buycmd":"defuser", "price":400, "buymenu":"b54", "onlyteam":"ct", "slot":"", "candrop":false, "buydisabled":false},' +
 
-'{"itemname":"molotov","clearname":"Vyacheslav Mikhailovich Molotov Cocktail","buycmd":"molotov", "price":400, "buymenu":"b61", "onlyteam":"t", "slot":"4", "candrop":false, "buydisabled":false},' +
-'{"itemname":"incgrenade","clearname":"Incendiary Greande","buycmd":"incgrenade", "price":600, "buymenu":"b61", "onlyteam":"ct", "slot":"4", "candrop":false, "buydisabled":false},' +
+'{"itemname":"molotov","clearname":"Molotov","buycmd":"molotov", "price":400, "buymenu":"b61", "onlyteam":"t", "slot":"4", "candrop":false, "buydisabled":false},' +
+'{"itemname":"incgrenade","clearname":"Incendiary Gren.","buycmd":"incgrenade", "price":600, "buymenu":"b61", "onlyteam":"ct", "slot":"4", "candrop":false, "buydisabled":false},' +
 '{"itemname":"decoy","clearname":"Decoy Grenade","buycmd":"decoy", "price":50, "buymenu":"b62", "onlyteam":"", "slot":"4", "candrop":false, "buydisabled":false},' +
 '{"itemname":"flashbang","clearname":"Flashbang","buycmd":"flashbang", "price":200, "buymenu":"b63", "onlyteam":"", "slot":"4", "candrop":false, "buydisabled":false},' +
-'{"itemname":"hegrenade","clearname":"High Explosive Grenade","buycmd":"hegrenade", "price":300, "buymenu":"b64", "onlyteam":"", "slot":"4", "candrop":false, "buydisabled":false},' +
+'{"itemname":"hegrenade","clearname":"HE Grenade","buycmd":"hegrenade", "price":300, "buymenu":"b64", "onlyteam":"", "slot":"4", "candrop":false, "buydisabled":false},' +
 '{"itemname":"smokegrenade","clearname":"Smoke Grenade","buycmd":"smokegrenade", "price":300, "buymenu":"b65", "onlyteam":"", "slot":"4", "candrop":false, "buydisabled":false}' + ']}';
 
 //'{"itemname":"","clearname":"","buycmd":"", "price":0, "buymenu":"b", "onlyteam":"", "slot":"1", "candrop":true, "buydisabled":false},' +
