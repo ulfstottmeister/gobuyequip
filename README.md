@@ -1,3 +1,5 @@
+![App Screenshot](https://github.com/ulfstottmeister/gobuyequip/blob/master/design%20screenshots/2019-07-30%2011_59_13-Window.png)
+
 gobuyequip
 ----------
 
