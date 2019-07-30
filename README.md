@@ -17,6 +17,14 @@ buy the selected items in such an order that items will be dropped if necessary.
 It is possible to save the buycommand string to a config file (e.g. buyset.cfg)
 and execute it with the exec command (e.g. "exec buyset.cfg") in the ingame console.
 
+CSGOBuyequipment In Action
+-----------
+The following screenshots show how a user creates an equipment set in CSGOBuyequipment, then copies the buycommand string and
+executes it in the ingame console. As a result the player is equipped with the set; exessive items land on the floor.
+![CSGOBuyeqipment in Browser](https://github.com/ulfstottmeister/gobuyequip/blob/master/design%20screenshots/demo_browser.png)
+![Ingame Opened Console](https://github.com/ulfstottmeister/gobuyequip/blob/master/design%20screenshots/demo_ingame1.jpg)
+![Ingame After Execution](https://github.com/ulfstottmeister/gobuyequip/blob/master/design%20screenshots/demo_ingame2.jpg)
+
 Search
 -------
 The result list can be modified by using the filter section,
