@@ -7,6 +7,11 @@ All it requires is a modern Web Browser.
 The App resembles the buy menu from Counter-Strike: Global Offensive.
 It shows a list of all items which are available for buying within the game.
 The user can buy items by clicking on them in the result list.
+A buycommand string is generated, which the user can copy to clipboard.
+Pasting the string into the game console from within the game will attempt to
+buy the selected items in such an order that items will be dropped if necessary.
+It is possible to save the buycommand string to a config file (e.g. buyset.cfg)
+and execute it with the exec command (e.g. "exec buyset.cfg") in the ingame console.
 
 Search
 -------
