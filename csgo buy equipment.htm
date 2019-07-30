@@ -107,7 +107,7 @@ input[type=text] {
 
 .textinput {
     height:30px;
-	width: 100%;
+	width: 70%;
     transition:height 1s;
     -webkit-transition:height 1s;
 }
@@ -341,7 +341,8 @@ function carryChanged() {
 	}
 	
 	//TODO: let's get the buy string in, when I'm done with the auto-drop feature
-	//console.log("Buy with: " + buycmdstr);
+	console.log("Buy with: \n" + buycmdstr);
+	document.getElementById("buystring").value = buycmdstr;
 	//console.log("carryChanged: Costs: " + sumOfCosts);
 	document.getElementById("sum").innerHTML = "Sum: $ " + sumOfCosts;
 }
@@ -588,14 +589,26 @@ function teamselectorChanged(team) {
 	searchInputChanged(); //re-run the item search
 }
 
+function copyBuystring() {
+	/* Select the text field */
+	var copytext = document.getElementById("buystring");
+	copytext.select();
+
+	/* Copy the text inside the text field */
+	document.execCommand("copy");
+	
+	console.log("copyBuystring: copied buystring to clipboard");
+}
+
 </script>
 <body id=thebody>
 	<div id="carrycontainer" class="carry">&nbsp;</div>
 	<div id="droppedcontainer" class="dropped">&nbsp;</div>
+	Buy command: <input type="text" id="buystring" class="textinput" readonly/>&nbsp;&nbsp;<button onclick="copyBuystring()">Copy</button>
 	<p class="sum" id="sum"></p>
 
-	<br>
-	<input type="text" class="textinput" name="itemsearch" id="itemsearch" value="" placeholder="Search items. Examples: ak, 47, b42" onchange="searchInputChanged()" onkeyup="searchInputChanged()">
+	<hr>
+	Search: <input type="text" class="textinput" name="itemsearch" id="itemsearch" value="" placeholder="Search items. Examples: ak, 47, b42" onchange="searchInputChanged()" onkeyup="searchInputChanged()">
 	<br>
 	<input type="radio" name="teamselect" id="ct" value="ct" onchange="teamselectorChanged(this.value)" hidden><label for="ct"><img src="menupix/ct_orb.png" alt="CT" title="CT" class="teamselectorb"></label>
 	<input type="radio" name="teamselect" id="t" value="t" onchange="teamselectorChanged(this.value)" hidden><label for="t"><img src="menupix/t_orb.png" alt="T" title="T" class="teamselectorb"></label>
