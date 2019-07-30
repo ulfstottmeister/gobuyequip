@@ -6,7 +6,9 @@ CSGOBuyequipment Overview
 CSGOBuyequipment is a locally executing JavaScript App without further dependencies.
 All it requires is a modern Web Browser.
 
-The App resembles the buy menu from Counter-Strike: Global Offensive.
+CSGOBuyequipment is an Economy Planner and a buy script maker for the game Counter-Strike: Global Offensive (CS:GO).
+
+The App resembles the buy menu from CS:GO.
 It shows a list of all items which are available for buying within the game.
 The user can buy items by clicking on them in the result list.
 A buycommand string is generated, which the user can copy to clipboard.
