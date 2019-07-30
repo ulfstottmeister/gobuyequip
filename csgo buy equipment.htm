@@ -4,6 +4,10 @@ body {
 	color: gray; /* general text color */
 }
 
+h1 {
+	color: gold;
+}
+
 .carry {
 	/* height: 150px; */ /* default value when the page loads.. should be altered as the carry items change*/
 }
@@ -601,7 +605,11 @@ function copyBuystring() {
 }
 
 </script>
+<head>
+	<title>CSGOBuyequipment</title>
+</head>
 <body id=thebody>
+	<h1>CSGOBuyequipment</h1>
 	<div id="carrycontainer" class="carry">&nbsp;</div>
 	<div id="droppedcontainer" class="dropped">&nbsp;</div>
 	Buy command: <input type="text" id="buystring" class="textinput" readonly/>&nbsp;&nbsp;<button onclick="copyBuystring()">Copy</button>
