@@ -1,6 +1,6 @@
 //database of relevant items
 //itemname is a unique key
-var rawjson = '{"weapons":[' +
+var itemdbjson = '[' +
 '{"itemname":"ctknife","clearname":"Knife","buycmd":"", "price":0, "buymenu":"", "onlyteam":"ct", "slot":"3", "candrop":false, "buydisabled":true},' +
 '{"itemname":"tknife","clearname":"Knife","buycmd":"", "price":0, "buymenu":"", "onlyteam":"t", "slot":"3", "candrop":false, "buydisabled":true},' +
 '{"itemname":"c4","clearname":"C4 Explosive","buycmd":"", "price":0, "buymenu":"", "onlyteam":"t", "slot":"5", "candrop":true, "buydisabled":true},' +
@@ -53,6 +53,7 @@ var rawjson = '{"weapons":[' +
 '{"itemname":"decoy","clearname":"Decoy Grenade","buycmd":"decoy", "price":50, "buymenu":"b62", "onlyteam":"", "slot":"4", "candrop":false, "buydisabled":false},' +
 '{"itemname":"flashbang","clearname":"Flashbang","buycmd":"flashbang", "price":200, "buymenu":"b63", "onlyteam":"", "slot":"4", "candrop":false, "buydisabled":false},' +
 '{"itemname":"hegrenade","clearname":"HE Grenade","buycmd":"hegrenade", "price":300, "buymenu":"b64", "onlyteam":"", "slot":"4", "candrop":false, "buydisabled":false},' +
-'{"itemname":"smokegrenade","clearname":"Smoke Grenade","buycmd":"smokegrenade", "price":300, "buymenu":"b65", "onlyteam":"", "slot":"4", "candrop":false, "buydisabled":false}' + ']}';
+'{"itemname":"smokegrenade","clearname":"Smoke Grenade","buycmd":"smokegrenade", "price":300, "buymenu":"b65", "onlyteam":"", "slot":"4", "candrop":false, "buydisabled":false}' +
 
+']';
 //'{"itemname":"","clearname":"","buycmd":"", "price":0, "buymenu":"b", "onlyteam":"", "slot":"1", "candrop":true, "buydisabled":false},' +

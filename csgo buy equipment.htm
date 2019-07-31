@@ -135,9 +135,8 @@ input[type=text] {
 
 <script src="itemdbjson.js"></script>
 <script>
-db = JSON.parse(rawjson); //access like: db.weapons[0].itemname;
 
-//var costs = 0; //sum up the costs for a kit. Can be calculated from the carry array.
+db = JSON.parse(itemdbjson); //access like: db[0].itemname;
 
 var searchFilter = new Map(); //use different filter options to search items in the DB.
 
@@ -168,7 +167,7 @@ function searchAndList(pattern) {
 	outputdiv.innerHTML = ""; //clear output
 	
 	var resultbundle = "";
-	for(var i=0; i < db.weapons.length; i++) {
+	for(var i=0; i < db.length; i++) {
 		//apply search-filtering
 		
 		/*
@@ -176,26 +175,26 @@ function searchAndList(pattern) {
 			The items have an onlyteam field with "ct" or "t", if they are restricted to the respective team,
 			or an empty string "", when the item is not team restricted
 		*/
-		if((searchFilter.get("team") != "both") && (db.weapons[i].onlyteam != "")) {
-			if(searchFilter.get("team") != db.weapons[i].onlyteam) {
-				//console.log("Filter: " + searchFilter.get("team") + " -- Item.onlyteam: " + db.weapons[i].onlyteam + " Item: " + db.weapons[i].itemname);
+		if((searchFilter.get("team") != "both") && (db[i].onlyteam != "")) {
+			if(searchFilter.get("team") != db[i].onlyteam) {
+				//console.log("Filter: " + searchFilter.get("team") + " -- Item.onlyteam: " + db[i].onlyteam + " Item: " + db[i].itemname);
 				continue; //skipping this loop iteration
 			}
 		}
-		if((searchFilter.get("showdisabled") == false) && (db.weapons[i].buydisabled == true)) {
-			//console.log("Filter: showdisabled:" + searchFilter.get("showdisabled") + " -- Item.buydisabled: " + db.weapons[i].buydisabled);
+		if((searchFilter.get("showdisabled") == false) && (db[i].buydisabled == true)) {
+			//console.log("Filter: showdisabled:" + searchFilter.get("showdisabled") + " -- Item.buydisabled: " + db[i].buydisabled);
 			continue;
 		}
-		if(db.weapons[i].price > searchFilter.get("maxprice")) {
+		if(db[i].price > searchFilter.get("maxprice")) {
 			continue;
 		}
 		
-		if(db.weapons[i].itemname.toLowerCase().includes(pattern) ||
-			db.weapons[i].clearname.toLowerCase().includes(pattern) ||
-			db.weapons[i].buycmd.includes(pattern) ||
-			(db.weapons[i].buymenu.includes(pattern) && (db.weapons[i].buymenu != "")) ||
-			db.weapons[i].price.toString() == pattern) {
-			resultbundle += createItemListing(db.weapons[i].itemname);
+		if(db[i].itemname.toLowerCase().includes(pattern) ||
+			db[i].clearname.toLowerCase().includes(pattern) ||
+			db[i].buycmd.includes(pattern) ||
+			(db[i].buymenu.includes(pattern) && (db[i].buymenu != "")) ||
+			db[i].price.toString() == pattern) {
+			resultbundle += createItemListing(db[i].itemname);
 		}
 	}
 	outputdiv.innerHTML = resultbundle;
@@ -344,10 +343,7 @@ function carryChanged() {
 		sumOfCosts += getDBobjectByname(carry[i]).price;
 	}
 	
-	//TODO: let's get the buy string in, when I'm done with the auto-drop feature
-	console.log("Buy with: \n" + buycmdstr);
 	document.getElementById("buystring").value = buycmdstr;
-	//console.log("carryChanged: Costs: " + sumOfCosts);
 	document.getElementById("sum").innerHTML = "Sum: $ " + sumOfCosts;
 }
 
@@ -551,7 +547,7 @@ function createItemListing(itemname) {
 }
 
 function getDBobjectByname(itemname) {
-	var item = db.weapons.find(obj => {
+	var item = db.find(obj => {
 		return (obj.itemname === itemname)
 	});
 	return item;
@@ -559,7 +555,7 @@ function getDBobjectByname(itemname) {
 
 function getItemImg(itemname) {
 	//console.log("getItemImg: " + itemname);
-	//var clearname = db.weapons.indexOf(itemname).clearname;
+	//var clearname = db.indexOf(itemname).clearname;
 	var item = getDBobjectByname(itemname);
 	var clearname = item.clearname;
 	
@@ -601,7 +597,7 @@ function copyBuystring() {
 	/* Copy the text inside the text field */
 	document.execCommand("copy");
 	
-	console.log("copyBuystring: copied buystring to clipboard");
+	//console.log("copyBuystring: copied buystring to clipboard");
 }
 
 </script>
