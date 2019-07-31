@@ -1,0 +1,132 @@
+body {
+	color: gray; /* general text color */
+	background-image: radial-gradient(darkgray 5%, black 40%, black);
+}
+
+h1 {
+	color: gold;
+}
+
+.carry {
+	/* height: 150px; */ /* default value when the page loads.. should be altered as the carry items change*/
+}
+
+.sum {
+    background-color:rgba(100, 100, 100, 0.1);
+    color:darkgreen;
+	font-size: 25px;
+	font-weight: bold;
+}
+
+.remove {
+	display: block;
+	width: 100%;
+	border: none;
+	background-color: #cc0000;
+	//padding: 14px 28px;
+	font-size: 16px;
+	cursor: pointer;
+	text-align: center;
+}
+
+.droppickup {
+	display: block;
+	width: 100%;
+	border: none;
+	background-color: #cccccc;
+	//padding: 14px 28px;
+	font-size: 16px;
+	cursor: pointer;
+	text-align: center;
+}
+
+
+input[type=text] {
+	border: 1px solid gray;
+    background-color:rgba(100, 100, 100, 0.1);
+    color:gray;
+
+}
+
+.teamselectorb {
+	width:30px;
+	height:30px;
+	opacity: 0.7;
+}
+
+.teamselectorb:hover {
+	width:35px;
+	height:35px;
+	opacity: 1;
+}
+
+.slider {
+    -webkit-appearance: none;
+    width: 40%;
+    height: 15px;
+    border-radius: 5px;
+    background: #d3d3d3;
+    outline: none;
+    opacity: 0.7;
+    -webkit-transition: opacity .15s ease-in-out;
+    transition: opacity .15s ease-in-out;
+}
+
+.slider:hover {
+  opacity: 1;
+}
+
+.slider::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 25px;
+  height: 25px;
+  border-radius: 50%;
+  background: #4CAF50;
+  cursor: pointer;
+}
+
+.slider::-moz-range-thumb {
+  width: 25px;
+  height: 25px;
+  border-radius: 50%;
+  background: #4CAF50;
+  cursor: pointer;
+}
+
+.itempicclass {
+	border: 1px solid black;
+	border-radius: 20%;
+	opacity: 0.7;
+}
+
+.itempicclass:hover {
+	border: 1px solid darkgreen;
+	border-radius: 20%;
+	opacity: 1;
+
+}
+
+
+.textinput {
+    height:30px;
+	width: 70%;
+    transition:height 1s;
+    -webkit-transition:height 1s;
+}
+
+
+.textinput:focus {
+	color: lightgray;
+    height:30px;
+    font-size:16px;
+}
+
+#copyrighttext {
+	color: darkgray;
+	font-size: 10;
+	position: fixed;
+	bottom: 0;
+	right: 0;
+}
+
