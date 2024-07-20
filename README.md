@@ -89,7 +89,7 @@ shown by default.
 Glossary
 --------
 -loadout setting: For some weapons the player can select alternatives. When doing so, the weapon will be replaced in the
-buymenu buy the player's selection. Loadout settings can be made on a per team basis. For example: a player can choose that
+buymenu by the player's selection. Loadout settings can be made on a per team basis. For example: a player can choose that
 pressing "b15" will buy them a Desert Eagle when they are playin as Counter-Terrorist, but it will buy them an R8 Revolver when
 playing as Terrorist. The GSGOBuyequipment App is agnostic of these settings and will show any possible database result when
 searching items as buycmd.
